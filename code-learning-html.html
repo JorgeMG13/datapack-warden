@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CodeLearn AI</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0f1117; color: #e2e8f0; font-family: 'Segoe UI', sans-serif; min-height: 100vh; }
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* HOME */
+  .home-wrap { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+  .hero { text-align: center; margin-bottom: 48px; }
+  .hero-icon { font-size: 52px; margin-bottom: 8px; }
+  .hero h1 { font-size: 32px; font-weight: 700; background: linear-gradient(90deg, #60a5fa, #34d399); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .hero p { color: #94a3b8; margin-top: 8px; font-size: 16px; }
+  .section-label { color: #94a3b8; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; text-align: center; margin-bottom: 12px; }
+  .level-row { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 36px; }
+  .level-btn { padding: 8px 22px; border-radius: 20px; border: 2px solid #2d3748; background: transparent; color: #94a3b8; cursor: pointer; font-weight: 600; font-size: 14px; transition: all .2s; }
+  .level-btn.active { border-color: #60a5fa; background: #1e3a5f; color: #60a5fa; }
+  .lang-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 16px; }
+  .lang-card { background: #1a1f2e; border: 1px solid #2d3748; border-radius: 12px; padding: 20px 16px; cursor: pointer; text-align: center; transition: all .2s; }
+  .lang-card:hover { transform: translateY(-2px); }
+  .lang-icon { font-size: 36px; margin-bottom: 8px; }
+  .lang-name { font-weight: 700; font-size: 15px; margin-bottom: 8px; }
+  .progress-bar-bg { height: 4px; background: #2d3748; border-radius: 2px; margin-bottom: 6px; }
+  .progress-bar-fill { height: 100%; border-radius: 2px; transition: width .5s; }
+  .prog-text { font-size: 11px; color: #94a3b8; }
+  .no-prog { font-size: 12px; color: #4a5568; }
+
+  /* TOPBAR */
+  .topbar { background: #1a1f2e; border-bottom: 1px solid #2d3748; padding: 12px 20px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .back-btn { background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 22px; line-height: 1; }
+  .lang-info { flex: 1; }
+  .lang-info-name { font-weight: 700; font-size: 15px; }
+  .lang-info-sub { font-size: 12px; color: #94a3b8; }
+  .tab-group { display: flex; gap: 8px; margin-left: auto; flex-wrap: wrap; }
+  .tab-btn { padding: 6px 14px; border-radius: 8px; border: none; background: #2d3748; color: #94a3b8; cursor: pointer; font-size: 13px; font-weight: 600; transition: all .2s; }
+  .tab-btn.active { background: #2563eb; color: #fff; }
+
+  /* LEARN */
+  .learn-wrap { max-width: 860px; margin: 0 auto; padding: 24px 20px; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  .loading-state { text-align: center; padding: 60px 20px; }
+  .loading-state .l-icon { font-size: 40px; margin-bottom: 16px; }
+  .loading-state p { color: #94a3b8; }
+
+  /* LESSON */
+  .lesson-card { background: #1a1f2e; border: 1px solid #2d3748; border-radius: 12px; padding: 24px; margin-bottom: 16px; }
+  .lesson-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+  .lesson-badge { background: #2563eb; color: #fff; border-radius: 6px; padding: 2px 10px; font-size: 12px; font-weight: 700; }
+  .lesson-title { font-size: 20px; font-weight: 700; }
+  .block { border-radius: 8px; padding: 14px; margin-bottom: 14px; }
+  .block-label { font-size: 12px; font-weight: 700; text-transform: uppercase; margin-bottom: 6px; }
+  .block-text { color: #cbd5e1; line-height: 1.7; white-space: pre-wrap; }
+  .block-obj { background: #0f1117; border-left: 3px solid #2563eb; }
+  .block-obj .block-label { color: #60a5fa; }
+  .block-ex { margin-bottom: 14px; }
+  .block-ex .block-label { color: #94a3b8; margin-bottom: 8px; }
+  pre.code-block { background: #0d1117; border: 1px solid #30363d; border-radius: 8px; padding: 16px; overflow-x: auto; font-size: 13px; color: #e6edf3; line-height: 1.6; font-family: 'Courier New', monospace; }
+  .block-exer { background: #0f2a1a; border: 1px solid #166534; }
+  .block-exer .block-label { color: #34d399; }
+  .block-tip { background: #1a1505; border: 1px solid #854d0e; padding: 12px 16px; border-radius: 8px; }
+  .tip-label { color: #fbbf24; font-weight: 700; }
+  .tip-text { color: #cbd5e1; }
+  .action-row { display: flex; gap: 12px; flex-wrap: wrap; }
+  .btn-secondary { flex: 1; min-width: 140px; padding: 12px; border-radius: 8px; border: 1px solid #2d3748; background: #1a1f2e; color: #60a5fa; cursor: pointer; font-weight: 600; font-size: 14px; }
+  .btn-primary { flex: 1; min-width: 140px; padding: 12px; border-radius: 8px; border: none; background: linear-gradient(90deg, #2563eb, #0ea5e9); color: #fff; cursor: pointer; font-weight: 700; font-size: 15px; }
+
+  /* CODE */
+  .code-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
+  .code-label { font-size: 14px; color: #94a3b8; }
+  .btn-ask { padding: 6px 14px; border-radius: 8px; border: none; background: #2563eb; color: #fff; cursor: pointer; font-size: 13px; }
+  #codeEditor { width: 100%; min-height: 400px; background: #0d1117; border: 1px solid #30363d; border-radius: 10px; padding: 20px; color: #e6edf3; font-family: 'Courier New', monospace; font-size: 14px; line-height: 1.7; resize: vertical; outline: none; }
+  .code-hint { margin-top: 10px; padding: 12px; background: #1a1f2e; border-radius: 8px; font-size: 12px; color: #4a5568; }
+
+  /* CHAT */
+  .chat-wrap { display: flex; flex-direction: column; height: calc(100vh - 170px); }
+  .chat-messages { flex: 1; overflow-y: auto; padding-bottom: 16px; }
+  .chat-empty { text-align: center; padding: 40px 20px; color: #4a5568; }
+  .chat-empty .c-icon { font-size: 40px; margin-bottom: 12px; }
+  .chat-empty p { font-size: 15px; color: #4a5568; margin-bottom: 6px; }
+  .chat-empty small { font-size: 13px; }
+  .msg-row { display: flex; margin-bottom: 12px; }
+  .msg-row.user { justify-content: flex-end; }
+  .msg-row.assistant { justify-content: flex-start; }
+  .bubble { max-width: 80%; border-radius: 12px; padding: 10px 16px; font-size: 14px; line-height: 1.6; white-space: pre-wrap; }
+  .bubble.user { background: #2563eb; color: #e2e8f0; }
+  .bubble.assistant { background: #1a1f2e; border: 1px solid #2d3748; color: #e2e8f0; }
+  .bubble-label { font-size: 11px; color: #60a5fa; font-weight: 700; margin-bottom: 4px; }
+  .chat-input-row { display: flex; gap: 10px; padding-top: 12px; border-top: 1px solid #2d3748; }
+  #chatInput { flex: 1; background: #1a1f2e; border: 1px solid #2d3748; border-radius: 8px; padding: 10px 14px; color: #e2e8f0; font-size: 14px; outline: none; font-family: inherit; }
+  #chatInput::placeholder { color: #4a5568; }
+  .btn-send { padding: 10px 20px; border-radius: 8px; border: none; background: #2563eb; color: #fff; cursor: pointer; font-weight: 700; font-size: 14px; }
+  .btn-send:disabled { background: #2d3748; cursor: default; }
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div id="homeScreen" class="screen active">
+  <div class="home-wrap">
+    <div class="hero">
+      <div class="hero-icon">🧑‍💻</div>
+      <h1>CodeLearn AI</h1>
+      <p>Aprende cualquier lenguaje de programación con tu tutor de IA personal</p>
+    </div>
+    <p class="section-label">Tu nivel</p>
+    <div class="level-row" id="levelRow"></div>
+    <p class="section-label">Elige un lenguaje</p>
+    <div class="lang-grid" id="langGrid"></div>
+  </div>
+</div>
+
+<!-- LEARN -->
+<div id="learnScreen" class="screen">
+  <div class="topbar">
+    <button class="back-btn" onclick="goHome()">←</button>
+    <span id="topLangIcon" style="font-size:22px"></span>
+    <div class="lang-info">
+      <div class="lang-info-name" id="topLangName"></div>
+      <div class="lang-info-sub" id="topLangSub"></div>
+    </div>
+    <div class="tab-group">
+      <button class="tab-btn active" onclick="switchTab('lesson')">📖 Lección</button>
+      <button class="tab-btn" onclick="switchTab('code')">💻 Código</button>
+      <button class="tab-btn" onclick="switchTab('chat')">🤖 Chat IA</button>
+    </div>
+  </div>
+  <div class="learn-wrap">
+    <!-- LESSON -->
+    <div id="tabLesson" class="tab-content active">
+      <div id="lessonLoading" class="loading-state">
+        <div class="l-icon">⏳</div>
+        <p>Generando tu lección personalizada...</p>
+      </div>
+      <div id="lessonContent" style="display:none"></div>
+    </div>
+    <!-- CODE -->
+    <div id="tabCode" class="tab-content">
+      <div class="code-header">
+        <span class="code-label" id="codeLangLabel">Editor de código</span>
+        <button class="btn-ask" onclick="switchTab('chat')">Pedir ayuda a la IA 🤖</button>
+      </div>
+      <textarea id="codeEditor" spellcheck="false" placeholder="// Escribe tu código aquí..."></textarea>
+      <div class="code-hint">💡 Practica el ejercicio de la lección. Cuando termines, usa el chat de IA para verificar tu solución.</div>
+    </div>
+    <!-- CHAT -->
+    <div id="tabChat" class="tab-content">
+      <div class="chat-wrap">
+        <div class="chat-messages" id="chatMessages">
+          <div class="chat-empty" id="chatEmpty">
+            <div class="c-icon">🤖</div>
+            <p id="chatEmptyTitle">Soy tu tutor de IA.</p>
+            <small>Pregúntame cualquier duda sobre la lección o pídeme que revise tu código.</small>
+          </div>
+        </div>
+        <div class="chat-input-row">
+          <input id="chatInput" type="text" placeholder="Escribe tu pregunta..." onkeydown="if(event.key==='Enter')sendChat()">
+          <button class="btn-send" id="sendBtn" onclick="sendChat()">Enviar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const LANGUAGES = [
+  { id:"python",     name:"Python",     icon:"🐍", color:"#3776AB" },
+  { id:"javascript", name:"JavaScript", icon:"⚡", color:"#F7DF1E" },
+  { id:"java",       name:"Java",       icon:"☕", color:"#ED8B00" },
+  { id:"cpp",        name:"C++",        icon:"⚙️", color:"#00599C" },
+  { id:"rust",       name:"Rust",       icon:"🦀", color:"#CE422B" },
+  { id:"go",         name:"Go",         icon:"🔵", color:"#00ACD7" },
+  { id:"typescript", name:"TypeScript", icon:"📘", color:"#3178C6" },
+  { id:"swift",      name:"Swift",      icon:"🍎", color:"#FA7343" },
+];
+const LEVELS = ["Principiante","Intermedio","Avanzado"];
+
+let selectedLevel = "Principiante";
+let selectedLang = null;
+let currentLesson = null;
+let chatHistory = [];
+let progress = {};
+
+// Load progress
+try { progress = JSON.parse(localStorage.getItem("clProgress") || "{}"); } catch {}
+
+function saveProgress() {
+  try { localStorage.setItem("clProgress", JSON.stringify(progress)); } catch {}
+}
+
+function getLangProg(id) {
+  return progress[id] || { lessons: 0, streak: 0, lastDate: null };
+}
+
+// Build home
+function buildHome() {
+  // Levels
+  const lr = document.getElementById("levelRow");
+  lr.innerHTML = LEVELS.map(l =>
+    `<button class="level-btn ${l===selectedLevel?'active':''}" onclick="setLevel('${l}')">${l}</button>`
+  ).join("");
+
+  // Lang grid
+  const lg = document.getElementById("langGrid");
+  lg.innerHTML = LANGUAGES.map(lang => {
+    const p = getLangProg(lang.id);
+    const pct = Math.min(p.lessons * 10, 100);
+    const progHtml = p.lessons > 0
+      ? `<div class="progress-bar-bg"><div class="progress-bar-fill" style="width:${pct}%;background:${lang.color}"></div></div>
+         <div class="prog-text">${p.lessons} lección${p.lessons!==1?'es':''} • 🔥 ${p.streak} días</div>`
+      : `<div class="no-prog">Sin empezar</div>`;
+    return `<div class="lang-card" onclick="startLearning('${lang.id}')" style="border-color: transparent"
+      onmouseover="this.style.borderColor='${lang.color}';this.style.transform='translateY(-2px)'"
+      onmouseout="this.style.borderColor='transparent';this.style.transform='none'">
+      <div class="lang-icon">${lang.icon}</div>
+      <div class="lang-name">${lang.name}</div>
+      ${progHtml}
+    </div>`;
+  }).join("");
+}
+
+function setLevel(l) {
+  selectedLevel = l;
+  buildHome();
+}
+
+function goHome() {
+  document.getElementById("homeScreen").classList.add("active");
+  document.getElementById("learnScreen").classList.remove("active");
+  buildHome();
+}
+
+async function startLearning(langId) {
+  selectedLang = LANGUAGES.find(l => l.id === langId);
+  document.getElementById("homeScreen").classList.remove("active");
+  document.getElementById("learnScreen").classList.add("active");
+
+  // Reset UI
+  chatHistory = [];
+  document.getElementById("chatMessages").innerHTML = `
+    <div class="chat-empty" id="chatEmpty">
+      <div class="c-icon">🤖</div>
+      <p>Soy tu tutor de ${selectedLang.name}.</p>
+      <small>Pregúntame cualquier duda sobre la lección o pídeme que revise tu código.</small>
+    </div>`;
+  document.getElementById("codeEditor").value = "";
+  document.getElementById("codeLangLabel").textContent = `Editor de código — ${selectedLang.name}`;
+  switchTab("lesson");
+
+  // Topbar
+  const p = getLangProg(selectedLang.id);
+  document.getElementById("topLangIcon").textContent = selectedLang.icon;
+  document.getElementById("topLangName").textContent = `${selectedLang.name} — ${selectedLevel}`;
+  document.getElementById("topLangSub").textContent = `${p.lessons} lecciones • 🔥 ${p.streak} días seguidos`;
+
+  await fetchLesson(p.lessons + 1);
+}
+
+async function fetchLesson(num) {
+  document.getElementById("lessonLoading").style.display = "block";
+  document.getElementById("lessonContent").style.display = "none";
+  currentLesson = null;
+
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1000,
+        system: "Eres un tutor experto en programación. Responde SIEMPRE en español. Genera lecciones claras con ejemplos de código reales.",
+        messages: [{
+          role: "user",
+          content: `Genera la lección número ${num} de ${selectedLang.name} para nivel ${selectedLevel}.
+Responde SOLO con JSON puro sin backticks ni markdown:
+{"titulo":"...","objetivo":"...","explicacion":"...","codigo_ejemplo":"...","ejercicio":"...","tip":"..."}`
+        }]
+      })
+    });
+    const data = await res.json();
+    const text = (data.content || []).find(b => b.type==="text")?.text || "";
+    const clean = text.replace(/```json|```/g,"").trim();
+    currentLesson = JSON.parse(clean);
+  } catch(e) {
+    currentLesson = { titulo:"Error al cargar", objetivo:"", explicacion:"No se pudo generar la lección. Verifica tu conexión e intenta de nuevo.", codigo_ejemplo:"", ejercicio:"", tip:"" };
+  }
+
+  renderLesson(num);
+}
+
+function renderLesson(num) {
+  document.getElementById("lessonLoading").style.display = "none";
+  const lc = document.getElementById("lessonContent");
+  lc.style.display = "block";
+  const l = currentLesson;
+
+  lc.innerHTML = `
+    <div class="lesson-card">
+      <div class="lesson-header">
+        <span class="lesson-badge">Lección ${num}</span>
+        <span class="lesson-title">${l.titulo}</span>
+      </div>
+      ${l.objetivo ? `<div class="block block-obj"><div class="block-label">🎯 Objetivo</div><div class="block-text">${l.objetivo}</div></div>` : ""}
+      ${l.explicacion ? `<div style="margin-bottom:14px"><div class="block-label" style="color:#94a3b8;font-size:12px;text-transform:uppercase;margin-bottom:8px">📚 Explicación</div><div class="block-text">${l.explicacion}</div></div>` : ""}
+      ${l.codigo_ejemplo ? `<div class="block-ex"><div class="block-label" style="color:#94a3b8;font-size:12px;text-transform:uppercase">💻 Ejemplo</div><pre class="code-block">${escHtml(l.codigo_ejemplo)}</pre></div>` : ""}
+      ${l.ejercicio ? `<div class="block block-exer"><div class="block-label">🏋️ Ejercicio</div><div class="block-text">${l.ejercicio}</div></div>` : ""}
+      ${l.tip ? `<div class="block-tip"><span class="tip-label">💡 Tip: </span><span class="tip-text">${l.tip}</span></div>` : ""}
+    </div>
+    <div class="action-row">
+      <button class="btn-secondary" onclick="switchTab('code')">💻 Practicar código</button>
+      <button class="btn-primary" onclick="completeLesson()">✅ Completar y seguir →</button>
+    </div>`;
+
+  if (l.codigo_ejemplo) document.getElementById("codeEditor").value = l.codigo_ejemplo;
+}
+
+function completeLesson() {
+  const id = selectedLang.id;
+  const today = new Date().toDateString();
+  const prev = getLangProg(id);
+  progress[id] = {
+    lessons: (prev.lessons || 0) + 1,
+    streak: prev.lastDate !== today ? (prev.streak || 0) + 1 : prev.streak || 0,
+    lastDate: today
+  };
+  saveProgress();
+
+  const p = progress[id];
+  document.getElementById("topLangSub").textContent = `${p.lessons} lecciones • 🔥 ${p.streak} días seguidos`;
+  fetchLesson(p.lessons + 1);
+}
+
+function switchTab(tab) {
+  ["lesson","code","chat"].forEach(t => {
+    document.getElementById("tab"+cap(t)).classList.toggle("active", t===tab);
+    document.querySelectorAll(".tab-btn").forEach((b,i) => {
+      if(["lesson","code","chat"][i]===tab) b.classList.add("active");
+      else b.classList.remove("active");
+    });
+  });
+}
+
+function cap(s) { return s.charAt(0).toUpperCase()+s.slice(1); }
+function escHtml(s) { return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+async function sendChat() {
+  const input = document.getElementById("chatInput");
+  const msg = input.value.trim();
+  if (!msg) return;
+  input.value = "";
+
+  // Hide empty state
+  const empty = document.getElementById("chatEmpty");
+  if (empty) empty.remove();
+
+  appendMsg("user", msg);
+  chatHistory.push({ role:"user", content: msg });
+
+  const sendBtn = document.getElementById("sendBtn");
+  sendBtn.disabled = true;
+  appendMsg("assistant", "✍️ Escribiendo...", "typing-bubble");
+
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1000,
+        system: `Eres un tutor de programación especializado en ${selectedLang?.name}. Nivel del estudiante: ${selectedLevel}. Responde siempre en español, de forma clara y concisa. Lección actual: ${currentLesson?.titulo || ""}`,
+        messages: chatHistory
+      })
+    });
+    const data = await res.json();
+    const reply = (data.content||[]).find(b=>b.type==="text")?.text || "No pude responder.";
+    chatHistory.push({ role:"assistant", content: reply });
+    removeBubble("typing-bubble");
+    appendMsg("assistant", reply);
+  } catch {
+    removeBubble("typing-bubble");
+    appendMsg("assistant", "Error al conectar con la IA.");
+  }
+
+  sendBtn.disabled = false;
+  document.getElementById("chatMessages").scrollTop = 99999;
+}
+
+function appendMsg(role, text, id) {
+  const container = document.getElementById("chatMessages");
+  const row = document.createElement("div");
+  row.className = `msg-row ${role}`;
+  if (id) row.id = id;
+  row.innerHTML = `<div class="bubble ${role}">${role==="assistant"?'<div class="bubble-label">🤖 Tutor IA</div>':""}<span>${escHtml(text)}</span></div>`;
+  container.appendChild(row);
+  container.scrollTop = 99999;
+}
+
+function removeBubble(id) {
+  const el = document.getElementById(id);
+  if (el) el.remove();
+}
+
+// Init
+buildHome();
+</script>
+</body>
+</html>
